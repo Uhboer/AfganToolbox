@@ -127,11 +127,11 @@ namespace Robust.Client.UserInterface.Controls
             ClearButtons();
             foreach (var num in leftButtons)
             {
-                AddLeftButton(num, num.ToString("+#;-#;0"));
+                AddLeftButton(num, num.ToString());
             }
             foreach (var num in rightButtons)
             {
-                AddRightButton(num, num.ToString("+#;-#;0"));
+                AddRightButton(num, num.ToString());
             }
         }
 

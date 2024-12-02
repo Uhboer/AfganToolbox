@@ -20,6 +20,7 @@ namespace Robust.Client.GameObjects
     /// </summary>
     public sealed class InputSystem : SharedInputSystem, IPostInjectInit
     {
+        [Dependency] private readonly IEntityManager _entityManager = default!;
         [Dependency] private readonly IInputManager _inputManager = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly IClientGameStateManager _stateManager = default!;

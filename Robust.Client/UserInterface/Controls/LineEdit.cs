@@ -53,15 +53,6 @@ namespace Robust.Client.UserInterface.Controls
         private TimeSpan? _lastClickTime;
         private Vector2? _lastClickPosition;
 
-        // Keep track of the frame on which we got focus, so we can implement SelectAllOnFocus properly.
-        // Otherwise, there's no way to keep track of whether the KeyDown is the one that focused the text box,
-        // to avoid text selection stomping on the behavior.
-        // This isn't a great way to do it.
-        // A better fix would be to annotate all input events with some unique sequence ID,
-        // and expose the input event that focused the control in KeyboardFocusEntered.
-        // But that sounds like a refactor I'm not doing today.
-        private uint _focusedOnFrame;
-
         private bool IsPlaceHolderVisible => !(HidePlaceHolderOnFocus && HasKeyboardFocus()) && string.IsNullOrEmpty(_text) && _placeHolder != null;
 
         public event Action<LineEditEventArgs>? OnTextChanged;
@@ -198,11 +189,6 @@ namespace Robust.Client.UserInterface.Controls
         public bool HidePlaceHolderOnFocus { get; set; }
 
         public bool IgnoreNext { get; set; }
-
-        /// <summary>
-        /// If true, all the text in the LineEdit will be automatically selected whenever it is focused.
-        /// </summary>
-        public bool SelectAllOnFocus { get; set; }
 
         private (int start, int length)? _imeData;
 
@@ -723,7 +709,7 @@ namespace Robust.Client.UserInterface.Controls
 
                 args.Handle();
             }
-            else if (!(SelectAllOnFocus && _focusedOnFrame == _timing.CurFrame))
+            else
             {
                 _lastClickTime = _timing.RealTime;
                 _lastClickPosition = args.PointerLocation.Position;
@@ -881,13 +867,6 @@ namespace Robust.Client.UserInterface.Controls
             if (Editable)
             {
                 _clyde.TextInputStart();
-            }
-
-            _focusedOnFrame = _timing.CurFrame;
-            if (SelectAllOnFocus)
-            {
-                CursorPosition = _text.Length;
-                SelectionStart = 0;
             }
         }
 

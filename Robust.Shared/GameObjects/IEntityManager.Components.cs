@@ -22,13 +22,11 @@ namespace Robust.Shared.GameObjects
         /// <summary>
         ///     Calls Initialize() on all registered components of the entity.
         /// </summary>
-        [Obsolete("Use InitializeEntity")]
         void InitializeComponents(EntityUid uid, MetaDataComponent? meta = null);
 
         /// <summary>
         ///     Calls Startup() on all registered components of the entity.
         /// </summary>
-        [Obsolete("Use StartEntity")]
         void StartComponents(EntityUid uid);
 
         /// <summary>
@@ -73,6 +71,19 @@ namespace Robust.Shared.GameObjects
         ///     Adds a Component with a given network id to an entity.
         /// </summary>
         IComponent AddComponent(EntityUid uid, ushort netId, MetaDataComponent? meta = null);
+
+        /// <summary>
+        ///     Adds an uninitialized Component type to an entity.
+        /// </summary>
+        /// <remarks>
+        ///     This function returns a disposable initialize handle that you can use in a <see langword="using" /> statement, to set up a component
+        ///     before initialization is ran on it.
+        /// </remarks>
+        /// <typeparam name="T">Concrete component type to add.</typeparam>
+        /// <param name="uid">Entity being modified.</param>
+        /// <returns>Component initialization handle. When you are done setting up the component, make sure to dispose this.</returns>
+        [Obsolete]
+        EntityManager.CompInitializeHandle<T> AddComponentUninitialized<T>(EntityUid uid) where T : IComponent, new();
 
         /// <summary>
         ///     Adds a Component to an entity. If the entity is already Initialized, the component will
@@ -415,16 +426,6 @@ namespace Robust.Shared.GameObjects
         /// Use sparingly.
         /// </summary>
         List<(EntityUid Uid, T Component)> AllComponentsList<T>() where T : IComponent;
-
-        /// <summary>
-        /// <see cref="ComponentQueryEnumerator"/>
-        /// </summary>
-        public ComponentQueryEnumerator ComponentQueryEnumerator(ComponentRegistry registry);
-
-        /// <summary>
-        /// <see cref="CompRegistryQueryEnumerator"/>
-        /// </summary>
-        public CompRegistryEntityEnumerator CompRegistryQueryEnumerator(ComponentRegistry registry);
 
         AllEntityQueryEnumerator<TComp1> AllEntityQueryEnumerator<TComp1>()
             where TComp1 : IComponent;

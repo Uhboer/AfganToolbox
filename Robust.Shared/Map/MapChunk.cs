@@ -39,11 +39,12 @@ namespace Robust.Shared.Map
         /// <summary>
         /// Chunk-local AABB of this chunk.
         /// </summary>
-        [ViewVariables]
         public Box2i CachedBounds { get; set; }
 
-        [ViewVariables]
-        internal HashSet<string> Fixtures = new();
+        /// <summary>
+        /// Physics fixtures that make up this grid chunk.
+        /// </summary>
+        public Dictionary<string, Fixture> Fixtures { get; } = new();
 
         /// <summary>
         /// The last game simulation tick that a tile on this chunk was modified.

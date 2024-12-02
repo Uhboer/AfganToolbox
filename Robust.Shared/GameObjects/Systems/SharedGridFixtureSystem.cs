@@ -94,9 +94,9 @@ namespace Robust.Shared.GameObjects
             {
                 UpdateFixture(uid, chunk, rectangles, body, manager, xform);
 
-                foreach (var id in chunk.Fixtures)
+                foreach (var (id, fixture) in chunk.Fixtures)
                 {
-                    fixtures[id] = manager.Fixtures[id];
+                    fixtures[id] = fixture;
                 }
             }
 
@@ -157,9 +157,8 @@ namespace Robust.Shared.GameObjects
             // Check if we even need to issue an eventbus event
             var updated = false;
 
-            foreach (var oldId in chunk.Fixtures)
+            foreach (var (oldId, oldFixture) in chunk.Fixtures)
             {
-                var oldFixture = manager.Fixtures[oldId];
                 var existing = false;
 
                 // Handle deleted / updated fixtures
@@ -197,16 +196,16 @@ namespace Robust.Shared.GameObjects
             // Anything remaining is a new fixture (or at least, may have not serialized onto the chunk yet).
             foreach (var (id, fixture) in newFixtures.Span)
             {
-                chunk.Fixtures.Add(id);
                 var existingFixture = _fixtures.GetFixtureOrNull(uid, id, manager: manager);
                 // Check if it's the same (otherwise remove anyway).
                 if (existingFixture?.Shape is PolygonShape poly &&
                     poly.EqualsApprox((PolygonShape) fixture.Shape))
                 {
-
+                    chunk.Fixtures.Add(id, existingFixture);
                     continue;
                 }
 
+                chunk.Fixtures.Add(id, fixture);
                 _fixtures.CreateFixture(uid, id, fixture, false, manager, body, xform);
             }
 

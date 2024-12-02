@@ -11,15 +11,15 @@ namespace Robust.Shared.Map;
 
 /// <inheritdoc cref="IMapManager" />
 [Virtual]
-internal partial class MapManager : IMapManagerInternal, IEntityEventSubscriber, IPostInjectInit
+internal partial class MapManager : IMapManagerInternal, IEntityEventSubscriber
 {
     [field: Dependency] public IGameTiming GameTiming { get; } = default!;
     [field: Dependency] public IEntityManager EntityManager { get; } = default!;
     [Dependency] private readonly IManifoldManager _manifolds = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
+
     [Dependency] private readonly IConsoleHost _conhost = default!;
 
-    private ISawmill _sawmill = default!;
+    private ISawmill _sawmill => _mapSystem.Log;
 
     private SharedMapSystem _mapSystem = default!;
     private SharedPhysicsSystem _physics = default!;
@@ -73,10 +73,5 @@ internal partial class MapManager : IMapManagerInternal, IEntityEventSubscriber,
         {
             EntityManager.DeleteEntity(uid);
         }
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _sawmill = _logManager.GetSawmill("system.map");
     }
 }

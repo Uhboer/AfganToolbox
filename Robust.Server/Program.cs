@@ -126,29 +126,13 @@ namespace Robust.Server
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 var message = ((Exception) args.ExceptionObject).ToString();
-                try
-                {
-                    uh.Log(args.IsTerminating ? LogLevel.Fatal : LogLevel.Error, message);
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Avoid eating the exception if it's during shutdown and the sawmill is already gone.
-                    System.Console.WriteLine($"UnhandledException but sawmill is disposed! {message}");
-                }
+                uh.Log(args.IsTerminating ? LogLevel.Fatal : LogLevel.Error, message);
             };
 
             var uo = mgr.GetSawmill("unobserved");
             TaskScheduler.UnobservedTaskException += (sender, args) =>
             {
-                try
-                {
-                    uo.Error(args.Exception!.ToString());
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Avoid eating the exception if it's during shutdown and the sawmill is already gone.
-                    System.Console.WriteLine($"UnobservedTaskException but sawmill is disposed! {args.Exception}");
-                }
+                uo.Error(args.Exception!.ToString());
 #if EXCEPTION_TOLERANCE
                 args.SetObserved(); // don't crash
 #endif

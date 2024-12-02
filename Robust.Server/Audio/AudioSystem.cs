@@ -66,26 +66,32 @@ public sealed partial class AudioSystem : SharedAudioSystem
 
     private void AddAudioFilter(EntityUid uid, AudioComponent component, Filter filter)
     {
-        DebugTools.Assert(component.IncludedEntities == null);
-        component.IncludedEntities = new();
+        var count = filter.Count;
 
-        if (filter.Count == 0)
+        if (count == 0)
             return;
 
         _pvs.AddSessionOverrides(uid, filter);
+
+        var ents = new HashSet<EntityUid>(count);
+
         foreach (var session in filter.Recipients)
         {
-            if (session.AttachedEntity is {} ent)
-                component.IncludedEntities.Add(ent);
+            var ent = session.AttachedEntity;
+
+            if (ent == null)
+                continue;
+
+            ents.Add(ent.Value);
         }
+
+        DebugTools.Assert(component.IncludedEntities == null);
+        component.IncludedEntities = ents;
     }
 
     /// <inheritdoc />
     public override (EntityUid Entity, AudioComponent Component)? PlayGlobal(string? filename, Filter playerFilter, bool recordReplay, AudioParams? audioParams = null)
     {
-        if (string.IsNullOrEmpty(filename))
-            return null;
-
         var entity = SetupAudio(filename, audioParams);
         AddAudioFilter(entity, entity.Comp, playerFilter);
         entity.Comp.Global = true;
@@ -167,17 +173,6 @@ public sealed partial class AudioSystem : SharedAudioSystem
         XformSystem.SetCoordinates(entity, coordinates);
 
         return (entity, entity.Comp);
-    }
-
-    /// <inheritdoc />
-    public override (EntityUid Entity, AudioComponent Component)? PlayLocal(
-        SoundSpecifier? sound,
-        EntityUid source,
-        EntityUid? soundInitiator,
-        AudioParams? audioParams = null
-    )
-    {
-        return null;
     }
 
     /// <inheritdoc />

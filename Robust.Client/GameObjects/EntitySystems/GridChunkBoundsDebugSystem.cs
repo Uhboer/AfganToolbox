@@ -82,7 +82,6 @@ namespace Robust.Client.GameObjects
             var viewport = args.WorldBounds;
             var worldHandle = args.WorldHandle;
 
-            var fixturesQuery = _entityManager.GetEntityQuery<FixturesComponent>();
             _grids.Clear();
             _mapManager.FindGridsIntersecting(currentMap, viewport, ref _grids);
             foreach (var grid in _grids)
@@ -90,15 +89,13 @@ namespace Robust.Client.GameObjects
                 var worldMatrix = _transformSystem.GetWorldMatrix(grid);
                 worldHandle.SetTransform(worldMatrix);
                 var transform = new Transform(Vector2.Zero, Angle.Zero);
-                var fixtures = fixturesQuery.Comp(grid.Owner);
 
                 var chunkEnumerator = _mapSystem.GetMapChunks(grid.Owner, grid.Comp, viewport);
 
                 while (chunkEnumerator.MoveNext(out var chunk))
                 {
-                    foreach (var id in chunk.Fixtures)
+                    foreach (var fixture in chunk.Fixtures.Values)
                     {
-                        var fixture = fixtures.Fixtures[id];
                         var poly = (PolygonShape) fixture.Shape;
 
                         var verts = new Vector2[poly.VertexCount];

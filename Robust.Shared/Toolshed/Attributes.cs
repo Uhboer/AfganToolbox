@@ -67,11 +67,10 @@ public sealed class CommandInvocationContextAttribute : Attribute
 }
 
 /// <summary>
-///     Marks a command implementation as taking the type of the previous command in sequence as a generic argument. Supports only one generic type.
+///     Marks a command implementation as taking the type of the previous command in sequence as a generic argument.
 /// </summary>
 /// <remarks>
-///     If the argument marked with <see cref="PipedArgumentAttribute"/> is not <c>T</c> but instead a pattern like <c>IEnumerable&lt;T&gt;</c>,
-///     Toolshed will account for this by using <see cref="ReflectionExtensions.IntersectWithGeneric"/>. It's not very precise.
+///     If the argument marked with <see cref="PipedArgumentAttribute"/> is not <c>T</c> but instead a pattern like <c>IEnumerable&lt;T&gt;</c>, Toolshed will account for this.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class TakesPipedTypeAsGenericAttribute : Attribute

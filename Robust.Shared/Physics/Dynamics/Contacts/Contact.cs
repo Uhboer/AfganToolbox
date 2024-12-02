@@ -37,7 +37,6 @@ using Robust.Shared.Physics.Collision;
 using Robust.Shared.Physics.Collision.Shapes;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.ViewVariables;
 
 namespace Robust.Shared.Physics.Dynamics.Contacts
 {
@@ -97,13 +96,11 @@ namespace Robust.Shared.Physics.Dynamics.Contacts
         /// <summary>
         ///     Determines whether the contact is touching.
         /// </summary>
-        [ViewVariables]
         public bool IsTouching { get; internal set; }
 
         /// Enable/disable this contact. This can be used inside the pre-solve
         /// contact listener. The contact is only disabled for the current
         /// time step (or sub-step in continuous collisions).
-        [ViewVariables]
         public bool Enabled { get; set; }
 
         /// <summary>
@@ -351,29 +348,6 @@ namespace Robust.Shared.Physics.Dynamics.Contacts
         {
             // TODO: Need to suss this out
             return HashCode.Combine(EntityA, EntityB);
-        }
-
-        /// <summary>
-        /// Gets the other ent for this contact.
-        /// </summary>
-        public EntityUid OtherEnt(EntityUid uid)
-        {
-            if (uid == EntityA)
-                return EntityB;
-            else if (uid == EntityB)
-                return EntityA;
-
-            throw new InvalidOperationException();
-        }
-
-        public (string Id, Fixture) OtherFixture(EntityUid uid)
-        {
-            if (uid == EntityA)
-                return (FixtureBId, FixtureB!);
-            else if (uid == EntityB)
-                return (FixtureAId, FixtureA!);
-
-            throw new InvalidOperationException();
         }
     }
 

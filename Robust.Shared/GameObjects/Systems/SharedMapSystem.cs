@@ -5,7 +5,6 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
 using Robust.Shared.Network;
-using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 
@@ -24,7 +23,6 @@ namespace Robust.Shared.GameObjects
         [Dependency] private readonly IComponentFactory _factory = default!;
         [Dependency] private readonly MetaDataSystem _meta = default!;
 
-        private EntityQuery<FixturesComponent> _fixturesQuery;
         private EntityQuery<MapComponent> _mapQuery;
         private EntityQuery<MapGridComponent> _gridQuery;
         private EntityQuery<MetaDataComponent> _metaQuery;
@@ -36,7 +34,6 @@ namespace Robust.Shared.GameObjects
         {
             base.Initialize();
 
-            _fixturesQuery = GetEntityQuery<FixturesComponent>();
             _mapQuery = GetEntityQuery<MapComponent>();
             _gridQuery = GetEntityQuery<MapGridComponent>();
             _metaQuery = GetEntityQuery<MetaDataComponent>();

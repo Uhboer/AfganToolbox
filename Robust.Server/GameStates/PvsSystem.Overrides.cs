@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
-using Robust.Shared.Utility;
 
 namespace Robust.Server.GameStates;
 
@@ -26,7 +25,6 @@ internal sealed partial class PvsSystem
         foreach (ref var ent in CollectionsMarshal.AsSpan(_cachedGlobalOverride))
         {
             ref var meta = ref _metadataMemory.GetRef(ent.Ptr.Index);
-            meta.Validate(ent.Meta);
             if ((mask & meta.VisMask) == meta.VisMask)
                 AddEntity(session, ref ent, ref meta, fromTick);
         }
@@ -53,7 +51,6 @@ internal sealed partial class PvsSystem
         foreach (ref var ent in CollectionsMarshal.AsSpan(_cachedForceOverride))
         {
             ref var meta = ref _metadataMemory.GetRef(ent.Ptr.Index);
-            meta.Validate(ent.Meta);
             if ((mask & meta.VisMask) == meta.VisMask)
                 AddEntity(session, ref ent, ref meta, fromTick);
         }

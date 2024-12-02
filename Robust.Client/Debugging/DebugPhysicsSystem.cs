@@ -544,7 +544,7 @@ namespace Robust.Client.Debugging
             switch (joint)
             {
                 case DistanceJoint:
-                    worldHandle.DrawLine(p1, p2, JointColor);
+                    worldHandle.DrawLine(xf1, xf2, JointColor);
                     break;
                 case PrismaticJoint prisma:
                     var pA = Transform.Mul(xfa, joint.LocalAnchorA);

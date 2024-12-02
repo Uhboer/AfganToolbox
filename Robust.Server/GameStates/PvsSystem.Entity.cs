@@ -107,7 +107,7 @@ internal sealed partial class PvsSystem
 
     internal void SyncMetadata(MetaDataComponent meta)
     {
-        if (meta.PvsData == PvsIndex.Invalid)
+        if (meta.PvsData == default)
             return;
 
         ref var ptr = ref _metadataMemory.GetRef(meta.PvsData.Index);

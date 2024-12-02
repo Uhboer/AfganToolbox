@@ -467,6 +467,8 @@ namespace Robust.Client.Graphics.Clyde
             {
                 using var _ = DebugGroup($"Viewport: {viewport.Name}");
 
+                var mapSystem = _entitySystemManager.GetEntitySystem<SharedMapSystem>();
+
                 var oldVp = _currentViewport;
 
                 _currentViewport = viewport;
@@ -486,7 +488,7 @@ namespace Robust.Client.Graphics.Clyde
                     using (DebugGroup("Lights"))
                     using (_prof.Group("Lights"))
                     {
-                        DrawLightsAndFov(viewport, worldBounds, worldAABB, eye);
+                        DrawLightsAndFov(mapSystem, viewport, worldBounds, worldAABB, eye);
                     }
 
                     using (_prof.Group("Overlays WSBW"))
@@ -514,7 +516,7 @@ namespace Robust.Client.Graphics.Clyde
 
                     if (_lightManager.Enabled && _lightManager.DrawHardFov && eye.DrawLight && eye.DrawFov)
                     {
-                        var mapUid = _mapSystem.GetMap(eye.Position.MapId);
+                        var mapUid = mapSystem.GetMap(eye.Position.MapId);
                         if (_entityManager.GetComponent<MapComponent>(mapUid).LightingEnabled)
                             ApplyFovToBuffer(viewport, eye);
                     }

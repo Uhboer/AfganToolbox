@@ -129,6 +129,7 @@ internal sealed partial class PvsSystem : EntitySystem
 
         SubscribeLocalEvent<MapChangedEvent>(OnMapChanged);
         SubscribeLocalEvent<GridRemovalEvent>(OnGridRemoved);
+        SubscribeLocalEvent<EntityTerminatingEvent>(OnEntityTerminating);
         SubscribeLocalEvent<TransformComponent, TransformStartupEvent>(OnTransformStartup);
 
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
@@ -136,7 +137,6 @@ internal sealed partial class PvsSystem : EntitySystem
         EntityManager.EntityAdded += OnEntityAdded;
         EntityManager.EntityDeleted += OnEntityDeleted;
         EntityManager.AfterEntityFlush += AfterEntityFlush;
-        EntityManager.BeforeEntityTerminating += OnEntityTerminating;
 
         Subs.CVar(_configManager, CVars.NetPVS, SetPvs, true);
         Subs.CVar(_configManager, CVars.NetMaxUpdateRange, OnViewsizeChanged, true);
@@ -162,7 +162,6 @@ internal sealed partial class PvsSystem : EntitySystem
         EntityManager.EntityAdded -= OnEntityAdded;
         EntityManager.EntityDeleted -= OnEntityDeleted;
         EntityManager.AfterEntityFlush -= AfterEntityFlush;
-        EntityManager.BeforeEntityTerminating -= OnEntityTerminating;
 
         _parallelMgr.ParallelCountChanged -= ResetParallelism;
 

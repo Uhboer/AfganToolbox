@@ -7,8 +7,13 @@ using Robust.Shared.Maths;
 
 namespace Robust.Shared.Map.Enumerators;
 
-internal ref struct ChunkEnumerator
+internal struct ChunkEnumerator
 {
+    /// <summary>
+    /// An empty enumerator that will return nothing.
+    /// </summary>
+    public static ChunkEnumerator Empty => new(new Dictionary<Vector2i, MapChunk>(), Box2.Empty, 1);
+
     private Dictionary<Vector2i, MapChunk> _chunks;
     private Vector2i _chunkLB;
     private Vector2i _chunkRT;

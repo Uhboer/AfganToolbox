@@ -70,7 +70,7 @@ public record InvalidAngle(string Value) : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted(
+        return FormattedMessage.FromMarkup(
             $"The value {Value} is not a valid angle.");
     }
 

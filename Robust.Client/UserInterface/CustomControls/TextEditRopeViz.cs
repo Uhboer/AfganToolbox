@@ -131,6 +131,11 @@ internal sealed class TextEditRopeViz : OSWindow
                     throw new ArgumentOutOfRangeException(nameof(node));
             }
         }
+
+        static UIBox2 Around(Vector2 vec, float size)
+        {
+            return new UIBox2(vec - new Vector2(size, size), vec + new Vector2(size, size));
+        }
     }
 
     private static Color[] CalcLeafColors()

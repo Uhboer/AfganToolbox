@@ -35,7 +35,6 @@ internal partial class UserInterfaceManager
                 return;
             _controlFocused?.ControlFocusExited();
             _controlFocused = value;
-            _needUpdateActiveCursor = true;
         }
     }
 
@@ -149,7 +148,7 @@ internal partial class UserInterfaceManager
         var newHovered = MouseGetControl(mouseMoveEventArgs.Position);
         SetHovered(newHovered);
 
-        var target = ControlFocused ?? CurrentlyHovered;
+        var target = ControlFocused ?? newHovered;
         if (target != null)
         {
             var pos = mouseMoveEventArgs.Position.Position;
@@ -165,7 +164,7 @@ internal partial class UserInterfaceManager
 
     public void UpdateHovered()
     {
-        var ctrl = MouseGetControl(_inputManager.MouseScreenPosition);
+        var ctrl =  MouseGetControl(_inputManager.MouseScreenPosition);
         SetHovered(ctrl);
     }
 

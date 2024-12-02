@@ -6,7 +6,6 @@ using Robust.Shared.Maths;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Collision.Shapes;
 using Robust.Shared.Physics.Dynamics;
-using Robust.Shared.Physics.Shapes;
 
 namespace Robust.Shared.GameObjects;
 
@@ -26,8 +25,12 @@ public sealed partial class EntityLookupSystem
         if (!_broadQuery.Resolve(lookupUid, ref lookup))
             return;
 
-        var lookupPoly = new Polygon(localAABB);
-        AddEntitiesIntersecting(lookupUid, intersecting, lookupPoly, localAABB, Physics.Transform.Empty, flags, lookup);
+        var lookupPoly = new PolygonShape();
+        lookupPoly.SetAsBox(localAABB);
+        var (lookupPos, lookupRot) = _transform.GetWorldPositionRotation(lookupUid);
+        var lookupTransform = new Transform(lookupPos, lookupRot);
+
+        AddEntitiesIntersecting(lookupUid, intersecting, lookupPoly, lookupTransform, flags, lookup);
     }
 
     private void AddLocalEntitiesIntersecting(
@@ -40,10 +43,11 @@ public sealed partial class EntityLookupSystem
         if (!_broadQuery.Resolve(lookupUid, ref lookup))
             return;
 
-        var shape = new Polygon(localBounds);
-        var localAABB = localBounds.CalcBoundingBox();
+        var shape = new PolygonShape();
+        shape.Set(localBounds);
 
-        AddEntitiesIntersecting(lookupUid, intersecting, shape, localAABB, Physics.Transform.Empty, flags);
+        var transform = _physics.GetPhysicsTransform(lookupUid);
+        AddEntitiesIntersecting(lookupUid, intersecting, shape, transform, flags);
     }
 
     public bool AnyLocalEntitiesIntersecting(EntityUid lookupUid,
@@ -55,8 +59,10 @@ public sealed partial class EntityLookupSystem
         if (!_broadQuery.Resolve(lookupUid, ref lookup))
             return false;
 
-        var shape = new Polygon(localAABB);
-        return AnyEntitiesIntersecting(lookupUid, shape, localAABB, Physics.Transform.Empty, flags, ignored, lookup);
+        var shape = new PolygonShape();
+        shape.SetAsBox(localAABB);
+        var transform = _physics.GetPhysicsTransform(lookupUid);
+        return AnyEntitiesIntersecting(lookupUid, shape, transform, flags, ignored, lookup);
     }
 
     public HashSet<EntityUid> GetLocalEntitiesIntersecting(EntityUid gridId, Vector2i gridIndices, float enlargement = TileEnlargementRadius, LookupFlags flags = DefaultFlags, MapGridComponent? gridComp = null)
@@ -66,16 +72,6 @@ public sealed partial class EntityLookupSystem
 
         GetLocalEntitiesIntersecting(gridId, gridIndices, intersecting, enlargement, flags, gridComp);
         return intersecting;
-    }
-
-    /// <summary>
-    /// Gets entities intersecting to the relative broadphase entity. Does NOT turn the transform into local terms.
-    /// </summary>
-    public void GetLocalEntitiesIntersecting(EntityUid gridUid, IPhysShape shape, Transform localTransform, HashSet<EntityUid> intersecting, LookupFlags flags = DefaultFlags, BroadphaseComponent? lookup = null)
-    {
-        var localAABB = shape.ComputeAABB(localTransform, 0);
-        AddEntitiesIntersecting(gridUid, intersecting, shape, localAABB, localTransform, flags: flags, lookup: lookup);
-        AddContained(intersecting, flags);
     }
 
     /// <summary>
@@ -92,7 +88,7 @@ public sealed partial class EntityLookupSystem
         }
 
         var localAABB = GetLocalBounds(localTile, tileSize);
-        localAABB = localAABB.Enlarged(enlargement);
+        localAABB = localAABB.Enlarged(TileEnlargementRadius);
         GetLocalEntitiesIntersecting(gridUid, localAABB, intersecting, flags);
     }
 

@@ -60,7 +60,7 @@ public record InvalidColor(string Value) : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted(
+        return FormattedMessage.FromMarkup(
             $"The value {Value} is not a valid RGB color or name of color.");
     }
 

@@ -224,8 +224,7 @@ namespace Robust.Client.Graphics
             // TODO: add support for int, and vec3/4 arrays
             return
                 (type == ShaderDataType.Float) ||
-                (type == ShaderDataType.Vec2) ||
-                (type == ShaderDataType.Bool);
+                (type == ShaderDataType.Vec2);
         }
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]

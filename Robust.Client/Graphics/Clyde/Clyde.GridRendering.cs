@@ -5,6 +5,7 @@ using OpenToolkit.Graphics.OpenGL4;
 using Robust.Shared.Enums;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Graphics;
+using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
@@ -14,6 +15,8 @@ namespace Robust.Client.Graphics.Clyde
 {
     internal partial class Clyde
     {
+        [Dependency] private readonly IEntityManager _entityManager = default!;
+
         private readonly Dictionary<EntityUid, Dictionary<Vector2i, MapChunkData>> _mapChunkData =
             new();
 
@@ -64,7 +67,7 @@ namespace Robust.Client.Graphics.Clyde
                 }
 
                 var transform = _entityManager.GetComponent<TransformComponent>(mapGrid);
-                gridProgram.SetUniform(UniIModelMatrix, _transformSystem.GetWorldMatrix(transform));
+                gridProgram.SetUniform(UniIModelMatrix, transform.WorldMatrix);
                 var enumerator = mapSystem.GetMapChunks(mapGrid.Owner, mapGrid.Comp, worldBounds);
 
                 while (enumerator.MoveNext(out var chunk))

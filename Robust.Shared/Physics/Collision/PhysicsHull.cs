@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using Robust.Shared.Maths;
 using Robust.Shared.Utility;
 
@@ -9,16 +8,10 @@ namespace Robust.Shared.Physics;
 /// <summary>
 /// Convex hull used for poly collision.
 /// </summary>
-internal ref struct PhysicsHull()
+public record struct PhysicsHull()
 {
-    public Span<Vector2> Points;
+    public readonly Vector2[] Points = new Vector2[PhysicsConstants.MaxPolygonVertices];
     public int Count;
-
-    public PhysicsHull(Span<Vector2> vertices, int count) : this()
-    {
-        Count = count;
-        Points = vertices[..count];
-    }
 
     private static PhysicsHull RecurseHull(Vector2 p1, Vector2 p2, Span<Vector2> ps, int count)
     {
@@ -65,7 +58,6 @@ internal ref struct PhysicsHull()
             return hull;
         }
 
-        hull.Points = new Vector2[PhysicsConstants.MaxPolygonVertices];
         var bestPoint = ps[bestIndex];
 
         // compute hull to the right of p1-bestPoint
@@ -101,8 +93,7 @@ internal ref struct PhysicsHull()
         PhysicsHull hull = new();
 
         if (count is < 3 or > PhysicsConstants.MaxPolygonVertices)
-        {
-            hull.Count = 0;
+	    {
             DebugTools.Assert(false);
 		    // check your data
 		    return hull;
@@ -215,13 +206,10 @@ internal ref struct PhysicsHull()
 	    var hull2 = RecurseHull(p2, p1, leftPoints, leftCount);
 
 	    if (hull1.Count == 0 && hull2.Count == 0)
-        {
-            hull.Count = 0;
+	    {
 		    // all points collinear
 		    return hull;
 	    }
-
-        hull.Points = new Vector2[PhysicsConstants.MaxPolygonVertices];
 
 	    // stitch hulls together, preserving CCW winding order
 	    hull.Points[hull.Count++] = p1;

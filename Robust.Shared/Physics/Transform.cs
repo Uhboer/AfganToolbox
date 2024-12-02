@@ -23,7 +23,6 @@
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using Robust.Shared.Maths;
 using Robust.Shared.Utility;
@@ -167,10 +166,10 @@ namespace Robust.Shared.Physics
 
         public Quaternion2D(Angle angle)
         {
-            var radians = angle.Theta;
+            var radians = (float) angle.Theta;
 
-            C = (float) Math.Cos(radians);
-            S = (float) Math.Sin(radians);
+            C = MathF.Cos(radians);
+            S = MathF.Sin(radians);
         }
 
         public Quaternion2D Set(float angle)

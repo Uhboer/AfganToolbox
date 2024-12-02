@@ -289,7 +289,7 @@ namespace Robust.Shared
         /// This influences both how frequently game code processes, and how frequently updates are sent to clients.
         /// </summary>
         public static readonly CVarDef<int> NetTickrate =
-            CVarDef.Create("net.tickrate", 30, CVar.ARCHIVE | CVar.REPLICATED | CVar.SERVER);
+            CVarDef.Create("net.tickrate", 60, CVar.ARCHIVE | CVar.REPLICATED | CVar.SERVER);
 
         /// <summary>
         /// Offset CurTime at server start by this amount (in seconds).
@@ -381,30 +381,6 @@ namespace Robust.Shared
         /// </summary>
         public static readonly CVarDef<bool> NetLidgrenLogError =
             CVarDef.Create("net.lidgren_log_error", true);
-
-        /// <summary>
-        /// If true, run network message encryption on another thread.
-        /// </summary>
-        public static readonly CVarDef<bool> NetEncryptionThread =
-            CVarDef.Create("net.encryption_thread", true);
-
-        /// <summary>
-        /// Outstanding buffer size used by <see cref="NetEncryptionThread"/>.
-        /// </summary>
-        public static readonly CVarDef<int> NetEncryptionThreadChannelSize =
-            CVarDef.Create("net.encryption_thread_channel_size", 16);
-
-        /// <summary>
-        /// Whether the server should request HWID system for client identification.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Note that modern HWIDs are only available if the connection is authenticated.
-        /// </para>
-        /// </remarks>
-        public static readonly CVarDef<bool> NetHWId =
-            CVarDef.Create("net.hwid", true, CVar.SERVERONLY);
-
 
         /**
          * SUS
@@ -682,13 +658,6 @@ namespace Robust.Shared
         /// </summary>
         public static readonly CVarDef<string> BuildManifestHash =
             CVarDef.Create("build.manifest_hash", "");
-
-        /// <summary>
-        /// Allows you to disable the display of all entities in the spawn menu that are not labeled with the ShowSpawnMenu category.
-        /// This is useful for forks that just want to disable the standard upstream content
-        /// </summary>
-        public static readonly CVarDef<string> EntitiesCategoryFilter =
-            CVarDef.Create("build.entities_category_filter", "");
 
         /*
          * WATCHDOG
@@ -1106,14 +1075,6 @@ namespace Robust.Shared
             CVarDef.Create("display.thread_window_blit", true, CVar.CLIENTONLY);
 
         /// <summary>
-        /// Diagnostic flag for testing. When using a separate thread for multi-window blitting,
-        /// should the worker be unblocked before the SwapBuffers(). Setting to true may improve
-        /// performance but may cause crashes or rendering errors.
-        /// </summary>
-        public static readonly CVarDef<bool> DisplayThreadUnlockBeforeSwap =
-            CVarDef.Create("display.thread_unlock_before_swap", false, CVar.CLIENTONLY);
-
-        /// <summary>
         /// Buffer size of input command channel from windowing thread to main game thread.
         /// </summary>
         public static readonly CVarDef<int> DisplayInputBufferSize =
@@ -1315,7 +1276,7 @@ namespace Robust.Shared
         /// Default is 35 m/s. Around half a tile per tick at 60 ticks per second.
         /// </remarks>
         public static readonly CVarDef<float> MaxLinVelocity =
-            CVarDef.Create("physics.maxlinvelocity", 35f, CVar.SERVER | CVar.REPLICATED);
+            CVarDef.Create("physics.maxlinvelocity", 35f);
 
         /// <summary>
         /// Maximum angular velocity in full rotations per second.
@@ -1664,16 +1625,6 @@ namespace Robust.Shared
             1024L * 1024, CVar.ARCHIVE);
 
         /// <summary>
-        /// Size of the replay (in kilobytes) at which point the replay is considered "large",
-        /// and replay clients should enable server GC (if possible) to improve performance.
-        /// </summary>
-        /// <remarks>
-        /// Set to -1 to never make replays use server GC.
-        /// </remarks>
-        public static readonly CVarDef<long> ReplayServerGCSizeThreshold =
-            CVarDef.Create("replay.server_gc_size_threshold", 50L * 1024);
-
-        /// <summary>
         /// Uncompressed size of individual files created by the replay (in kilobytes), where each file contains data
         /// for one or more ticks. Actual files may be slightly larger, this is just a threshold for the file to get
         /// written. After compressing, the files are generally ~30% of their uncompressed size.
@@ -1825,12 +1776,5 @@ namespace Robust.Shared
         /// </summary>
         public static readonly CVarDef<int> ToolshedNearbyLimit =
             CVarDef.Create("toolshed.nearby_limit", 200, CVar.SERVER | CVar.REPLICATED);
-
-        /// <summary>
-        ///     The max amount of entities that can be passed to the nearby toolshed command.
-        ///     Any higher value will cause an exception.
-        /// </summary>
-        public static readonly CVarDef<int> ToolshedNearbyEntitiesLimit =
-            CVarDef.Create("toolshed.nearby_entities_limit", 5, CVar.SERVER | CVar.REPLICATED);
     }
 }

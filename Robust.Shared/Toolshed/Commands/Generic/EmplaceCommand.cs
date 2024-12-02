@@ -16,7 +16,7 @@ public sealed class EmplaceCommand : ToolshedCommand
     public override Type[] TypeParameterParsers => new[] {typeof(Type)};
 
     [CommandImplementation, TakesPipedTypeAsGeneric]
-    TOut Emplace<TOut, TIn>(
+    TOut Emplace<TIn, TOut>(
         [CommandInvocationContext] IInvocationContext ctx,
         [PipedArgument] TIn value,
         [CommandArgument] Block<TOut> block
@@ -27,7 +27,7 @@ public sealed class EmplaceCommand : ToolshedCommand
     }
 
     [CommandImplementation, TakesPipedTypeAsGeneric]
-    IEnumerable<TOut> Emplace<TOut, TIn>(
+    IEnumerable<TOut> Emplace<TIn, TOut>(
             [CommandInvocationContext] IInvocationContext ctx,
             [PipedArgument] IEnumerable<TIn> value,
             [CommandArgument] Block<TOut> block

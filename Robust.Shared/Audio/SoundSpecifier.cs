@@ -17,6 +17,9 @@ public abstract partial class SoundSpecifier
 {
     [DataField("params")]
     public AudioParams Params { get; set; } = AudioParams.Default;
+
+    [Obsolete("Use SharedAudioSystem.GetSound(), or just pass sound specifier directly into SharedAudioSystem.")]
+    public abstract string GetSound(IRobustRandom? rand = null, IPrototypeManager? proto = null);
 }
 
 [Serializable, NetSerializable]
@@ -42,6 +45,12 @@ public sealed partial class SoundPathSpecifier : SoundSpecifier
         if (@params.HasValue)
             Params = @params.Value;
     }
+
+    [Obsolete("Use SharedAudioSystem.GetSound(), or just pass sound specifier directly into SharedAudioSystem.")]
+    public override string GetSound(IRobustRandom? rand = null, IPrototypeManager? proto = null)
+    {
+        return Path.ToString();
+    }
 }
 
 [Serializable, NetSerializable]
@@ -60,5 +69,16 @@ public sealed partial class SoundCollectionSpecifier : SoundSpecifier
         Collection = collection;
         if (@params.HasValue)
             Params = @params.Value;
+    }
+
+    [Obsolete("Use SharedAudioSystem.GetSound(), or just pass sound specifier directly into SharedAudioSystem.")]
+    public override string GetSound(IRobustRandom? rand = null, IPrototypeManager? proto = null)
+    {
+        if (Collection == null)
+            return string.Empty;
+
+        IoCManager.Resolve(ref rand, ref proto);
+        var soundCollection = proto.Index<SoundCollectionPrototype>(Collection);
+        return rand.Pick(soundCollection.PickFiles).ToString();
     }
 }

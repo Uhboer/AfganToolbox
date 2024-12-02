@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -191,15 +190,6 @@ internal struct PvsMetadata
     private byte Pad0;
     public uint Marker;
 #endif
-
-    [Conditional("DEBUG")]
-    public void Validate(MetaDataComponent comp)
-    {
-        DebugTools.AssertEqual(NetEntity, comp.NetEntity);
-        DebugTools.AssertEqual(VisMask, comp.VisibilityMask);
-        DebugTools.AssertEqual(LifeStage, comp.EntityLifeStage);
-        DebugTools.Assert(LastModifiedTick == comp.EntityLastModifiedTick || LastModifiedTick.Value == 0);
-    }
 }
 
 [StructLayout(LayoutKind.Sequential, Size = 16)]

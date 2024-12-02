@@ -76,6 +76,12 @@ namespace Robust.Shared.Map.Components
         #region TileAccess
 
         [Obsolete("Use the MapSystem method")]
+        public TileRef GetTileRef(MapCoordinates coords)
+        {
+            return MapSystem.GetTileRef(Owner, this, coords);
+        }
+
+        [Obsolete("Use the MapSystem method")]
         public TileRef GetTileRef(EntityCoordinates coords)
         {
             return MapSystem.GetTileRef(Owner, this, coords);
@@ -115,6 +121,20 @@ namespace Robust.Shared.Map.Components
         public void SetTiles(List<(Vector2i GridIndices, Tile Tile)> tiles)
         {
             MapSystem.SetTiles(Owner, this, tiles);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<TileRef> GetLocalTilesIntersecting(Box2Rotated localArea, bool ignoreEmpty = true,
+            Predicate<TileRef>? predicate = null)
+        {
+            return MapSystem.GetLocalTilesIntersecting(Owner, this, localArea, ignoreEmpty, predicate);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<TileRef> GetTilesIntersecting(Box2Rotated worldArea, bool ignoreEmpty = true,
+            Predicate<TileRef>? predicate = null)
+        {
+            return MapSystem.GetTilesIntersecting(Owner, this, worldArea, ignoreEmpty, predicate);
         }
 
         [Obsolete("Use the MapSystem method")]
@@ -183,6 +203,18 @@ namespace Robust.Shared.Map.Components
         }
 
         [Obsolete("Use the MapSystem method")]
+        public IEnumerable<EntityUid> GetLocalAnchoredEntities(Box2 localAABB)
+        {
+            return MapSystem.GetLocalAnchoredEntities(Owner, this, localAABB);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<EntityUid> GetAnchoredEntities(Box2 worldAABB)
+        {
+            return MapSystem.GetAnchoredEntities(Owner, this, worldAABB);
+        }
+
+        [Obsolete("Use the MapSystem method")]
         public Vector2i TileIndicesFor(EntityCoordinates coords)
         {
             return MapSystem.TileIndicesFor(Owner, this, coords);
@@ -192,6 +224,24 @@ namespace Robust.Shared.Map.Components
         public Vector2i TileIndicesFor(MapCoordinates worldPos)
         {
             return MapSystem.TileIndicesFor(Owner, this, worldPos);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<EntityUid> GetInDir(EntityCoordinates position, Direction dir)
+        {
+            return MapSystem.GetInDir(Owner, this, position, dir);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<EntityUid> GetLocal(EntityCoordinates coords)
+        {
+            return MapSystem.GetLocal(Owner, this, coords);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public IEnumerable<EntityUid> GetCardinalNeighborCells(EntityCoordinates coords)
+        {
+            return MapSystem.GetCardinalNeighborCells(Owner, this, coords);
         }
 
         [Obsolete("Use the MapSystem method")]
@@ -239,6 +289,18 @@ namespace Robust.Shared.Map.Components
         }
 
         [Obsolete("Use the MapSystem method")]
+        public bool CollidesWithGrid(Vector2i indices)
+        {
+            return MapSystem.CollidesWithGrid(Owner, this, indices);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public Vector2i GridTileToChunkIndices(Vector2i gridTile)
+        {
+            return MapSystem.GridTileToChunkIndices(Owner, this, gridTile);
+        }
+
+        [Obsolete("Use the MapSystem method")]
         public EntityCoordinates GridTileToLocal(Vector2i gridTile)
         {
             return MapSystem.GridTileToLocal(Owner, this, gridTile);
@@ -248,6 +310,12 @@ namespace Robust.Shared.Map.Components
         public Vector2 GridTileToWorldPos(Vector2i gridTile)
         {
             return MapSystem.GridTileToWorldPos(Owner, this, gridTile);
+        }
+
+        [Obsolete("Use the MapSystem method")]
+        public MapCoordinates GridTileToWorld(Vector2i gridTile)
+        {
+            return MapSystem.GridTileToWorld(Owner, this, gridTile);
         }
 
         [Obsolete("Use the MapSystem method")]
@@ -267,7 +335,7 @@ namespace Robust.Shared.Map.Components
     ///     Serialized state of a <see cref="MapGridComponentState"/>.
     /// </summary>
     [Serializable, NetSerializable]
-    internal sealed class MapGridComponentState(ushort chunkSize, Dictionary<Vector2i, ChunkDatum> fullGridData, GameTick lastTileModifiedTick) : ComponentState
+    internal sealed class MapGridComponentState(ushort chunkSize, Dictionary<Vector2i, Tile[]> fullGridData, GameTick lastTileModifiedTick) : ComponentState
     {
         /// <summary>
         ///     The size of the chunks in the map grid.
@@ -277,7 +345,7 @@ namespace Robust.Shared.Map.Components
         /// <summary>
         /// Networked chunk data containing the full grid state.
         /// </summary>
-        public Dictionary<Vector2i, ChunkDatum> FullGridData = fullGridData;
+        public Dictionary<Vector2i, Tile[]> FullGridData = fullGridData;
 
         /// <summary>
         /// Last game tick that the tile on the grid was modified.
@@ -289,7 +357,7 @@ namespace Robust.Shared.Map.Components
     ///     Serialized state of a <see cref="MapGridComponentState"/>.
     /// </summary>
     [Serializable, NetSerializable]
-    internal sealed class MapGridComponentDeltaState(ushort chunkSize, Dictionary<Vector2i, ChunkDatum>? chunkData, GameTick lastTileModifiedTick)
+    internal sealed class MapGridComponentDeltaState(ushort chunkSize, List<ChunkDatum>? chunkData, GameTick lastTileModifiedTick)
         : ComponentState, IComponentDeltaState<MapGridComponentState>
     {
         /// <summary>
@@ -300,7 +368,7 @@ namespace Robust.Shared.Map.Components
         /// <summary>
         /// Networked chunk data.
         /// </summary>
-        public readonly Dictionary<Vector2i, ChunkDatum>? ChunkData = chunkData;
+        public readonly List<ChunkDatum>? ChunkData = chunkData;
 
         /// <summary>
         /// Last game tick that the tile on the grid was modified.
@@ -314,12 +382,12 @@ namespace Robust.Shared.Map.Components
             if (ChunkData == null)
                 return;
 
-            foreach (var (index, data) in ChunkData)
+            foreach (var data in ChunkData)
             {
                 if (data.IsDeleted())
-                    state.FullGridData.Remove(index);
+                    state.FullGridData!.Remove(data.Index);
                 else
-                    state.FullGridData[index] = new(data);
+                    state.FullGridData![data.Index] = data.TileData;
             }
 
             state.LastTileModifiedTick = LastTileModifiedTick;
@@ -327,11 +395,12 @@ namespace Robust.Shared.Map.Components
 
         public MapGridComponentState CreateNewFullState(MapGridComponentState state)
         {
-            var fullGridData = new Dictionary<Vector2i, ChunkDatum>(state.FullGridData.Count);
+            var fullGridData = new Dictionary<Vector2i, Tile[]>(state.FullGridData.Count);
 
             foreach (var (key, value) in state.FullGridData)
             {
-                fullGridData[key] = new(value);
+                var arr = fullGridData[key] = new Tile[value.Length];
+                Array.Copy(value, arr, value.Length);
             }
 
             var newState = new MapGridComponentState(ChunkSize, fullGridData, LastTileModifiedTick);

@@ -204,7 +204,7 @@ namespace Robust.Shared.GameObjects
         /// <summary>
         /// Offset into internal PVS data.
         /// </summary>
-        internal PvsIndex PvsData = PvsIndex.Invalid;
+        internal PvsIndex PvsData;
     }
 
     [Flags]
@@ -254,8 +254,5 @@ namespace Robust.Shared.GameObjects
         /// An invalid index. This is also used as a marker value in the free list.
         /// </summary>
         public static readonly PvsIndex Invalid = new PvsIndex(-1);
-        // TODO PVS
-        // Consider making 0 an invalid value.
-        // it prevents default structs from accidentally being used.
     }
 }

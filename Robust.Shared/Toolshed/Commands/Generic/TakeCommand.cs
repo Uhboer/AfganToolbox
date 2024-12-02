@@ -7,7 +7,7 @@ namespace Robust.Shared.Toolshed.Commands.Generic;
 [ToolshedCommand]
 public sealed class TakeCommand : ToolshedCommand
 {
-    [CommandImplementation, TakesPipedTypeAsGeneric]
+    [CommandImplementation]
     public IEnumerable<T> Take<T>(
             [CommandInvocationContext] IInvocationContext ctx,
             [PipedArgument] IEnumerable<T> input,

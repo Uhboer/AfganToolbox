@@ -21,12 +21,9 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Robust.Client.Map
 {
-    internal sealed class ClydeTileDefinitionManager : TileDefinitionManager, IClydeTileDefinitionManager, IPostInjectInit
+    internal sealed class ClydeTileDefinitionManager : TileDefinitionManager, IClydeTileDefinitionManager
     {
         [Dependency] private readonly IResourceManager _manager = default!;
-        [Dependency] private readonly ILogManager _logManager = default!;
-
-        private ISawmill _sawmill = default!;
 
         private Texture? _tileTextureAtlas;
 
@@ -101,7 +98,8 @@ namespace Robust.Client.Map
             if (imgWidth >= 2048 || imgHeight >= 2048)
             {
                 // Sanity warning, some machines don't have textures larger than this and need multiple atlases.
-                _sawmill.Warning($"Tile texture atlas is ({imgWidth} x {imgHeight}), larger than 2048 x 2048. If you really need {tileCount} tiles, file an issue on RobustToolbox.");
+                Logger.WarningS("clyde",
+                    $"Tile texture atlas is ({imgWidth} x {imgHeight}), larger than 2048 x 2048. If you really need {tileCount} tiles, file an issue on RobustToolbox.");
             }
 
             var column = 1;
@@ -152,11 +150,6 @@ namespace Robust.Client.Map
             }
 
             _tileTextureAtlas = Texture.LoadFromImage(sheet, "Tile Atlas");
-        }
-
-        void IPostInjectInit.PostInject()
-        {
-            _sawmill = _logManager.GetSawmill("clyde");
         }
     }
 

@@ -47,14 +47,12 @@ public abstract class MetaDataSystem : EntitySystem
         if (!_metaQuery.Resolve(uid, ref metadata) || value.Equals(metadata.EntityName))
             return;
 
-        var oldName = metadata.EntityName;
-
         metadata._entityName = value;
 
         if (raiseEvents)
         {
-            var ev = new EntityRenamedEvent(uid, oldName, value);
-            RaiseLocalEvent(uid, ref ev, true);
+            var ev = new EntityRenamedEvent(value);
+            RaiseLocalEvent(uid, ref ev);
         }
 
         Dirty(uid, metadata, metadata);

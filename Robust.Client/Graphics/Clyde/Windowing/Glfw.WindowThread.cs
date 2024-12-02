@@ -85,10 +85,6 @@ namespace Robust.Client.Graphics.Clyde
                         WinThreadWinSetMonitor(cmd);
                         break;
 
-                    case CmdWinSetSize cmd:
-                        WinThreadWinSetSize(cmd);
-                        break;
-
                     case CmdWinSetVisible cmd:
                         WinThreadWinSetVisible(cmd);
                         break;
@@ -236,11 +232,6 @@ namespace Robust.Client.Graphics.Clyde
 
             private sealed record CmdWinSetFullscreen(
                 nint Window
-            ) : CmdBase;
-
-            private sealed record CmdWinSetSize(
-                nint Window,
-                int W, int H
             ) : CmdBase;
 
             private sealed record CmdWinSetVisible(

@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using OpenToolkit;
 using OpenToolkit.Graphics.OpenGL4;
-using Robust.Client.GameObjects;
 using Robust.Client.Input;
 using Robust.Client.Map;
 using Robust.Client.ResourceManagement;
@@ -32,6 +31,7 @@ namespace Robust.Client.Graphics.Clyde
     internal sealed partial class Clyde : IClydeInternal, IPostInjectInit, IEntityEventSubscriber
     {
         [Dependency] private readonly IClydeTileDefinitionManager _tileDefinitionManager = default!;
+        [Dependency] private readonly IEyeManager _eyeManager = default!;
         [Dependency] private readonly ILightManager _lightManager = default!;
         [Dependency] private readonly ILogManager _logManager = default!;
         [Dependency] private readonly IMapManager _mapManager = default!;
@@ -46,7 +46,6 @@ namespace Robust.Client.Graphics.Clyde
         [Dependency] private readonly IDependencyCollection _deps = default!;
         [Dependency] private readonly ILocalizationManager _loc = default!;
         [Dependency] private readonly IInputManager _inputManager = default!;
-        [Dependency] private readonly ClientEntityManager _entityManager = default!;
 
         private GLUniformBuffer<ProjViewMatrices> ProjViewUBO = default!;
         private GLUniformBuffer<UniformConstants> UniformConstantsUBO = default!;
@@ -79,7 +78,6 @@ namespace Robust.Client.Graphics.Clyde
 
         private ISawmill _clydeSawmill = default!;
         private ISawmill _sawmillOgl = default!;
-        private ISawmill _sawmillWin = default!;
 
         private IBindingsContext _glBindingsContext = default!;
         private bool _earlyGLInit;
@@ -96,7 +94,6 @@ namespace Robust.Client.Graphics.Clyde
         {
             _clydeSawmill = _logManager.GetSawmill("clyde");
             _sawmillOgl = _logManager.GetSawmill("clyde.ogl");
-            _sawmillWin = _logManager.GetSawmill("clyde.win");
 
             _cfg.OnValueChanged(CVars.DisplayOGLCheckErrors, b => _checkGLErrors = b, true);
             _cfg.OnValueChanged(CVars.DisplayVSync, VSyncChanged, true);
@@ -124,8 +121,6 @@ namespace Robust.Client.Graphics.Clyde
         public bool InitializePostWindowing()
         {
             _gameThread = Thread.CurrentThread;
-
-            InitSystems();
 
             InitGLContextManager();
             if (!InitMainWindowAndRenderer())

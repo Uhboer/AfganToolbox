@@ -13,7 +13,6 @@ namespace Robust.Shared.Network.Messages.Handshake
 
         public byte[] VerifyToken;
         public byte[] PublicKey;
-        public bool WantHwid;
 
         public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
         {
@@ -21,7 +20,6 @@ namespace Robust.Shared.Network.Messages.Handshake
             VerifyToken = buffer.ReadBytes(tokenLength);
             var keyLength = buffer.ReadVariableInt32();
             PublicKey = buffer.ReadBytes(keyLength);
-            WantHwid = buffer.ReadBoolean();
         }
 
         public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
@@ -30,7 +28,6 @@ namespace Robust.Shared.Network.Messages.Handshake
             buffer.Write(VerifyToken);
             buffer.WriteVariableInt32(PublicKey.Length);
             buffer.Write(PublicKey);
-            buffer.Write(WantHwid);
         }
     }
 }

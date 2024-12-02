@@ -57,7 +57,6 @@ internal sealed partial class PvsSystem
         foreach (ref var ent in span)
         {
             ref var meta = ref _metadataMemory.GetRef(ent.Ptr.Index);
-            meta.Validate(ent.Meta);
             if ((mask & meta.VisMask) == meta.VisMask)
                 AddEntity(session, ref ent, ref meta, fromTick);
         }
@@ -79,7 +78,8 @@ internal sealed partial class PvsSystem
 
         if (meta.LifeStage >= EntityLifeStage.Terminating)
         {
-            Log.Error($"Attempted to send deleted entity: {ToPrettyString(ent.Uid)}, Meta lifestage: {ent.Meta.EntityLifeStage}, PVS lifestage: {meta.LifeStage}.\n{Environment.StackTrace}");
+            Log.Error($"Attempted to send deleted entity: {ToPrettyString(ent.Uid)}");
+            EntityManager.QueueDeleteEntity(ent.Uid);
             return;
         }
 

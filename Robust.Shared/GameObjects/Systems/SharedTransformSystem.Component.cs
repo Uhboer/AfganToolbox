@@ -107,11 +107,6 @@ public abstract partial class SharedTransformSystem
         return AnchorEntity(uid, xform, grid.Owner, grid, tileIndices);
     }
 
-    public bool AnchorEntity(EntityUid uid)
-    {
-        return AnchorEntity(uid, XformQuery.GetComponent(uid));
-    }
-
     public bool AnchorEntity(EntityUid uid, TransformComponent xform)
     {
         return AnchorEntity((uid, xform));
@@ -130,11 +125,6 @@ public abstract partial class SharedTransformSystem
 
         var tileIndices =  _map.TileIndicesFor(grid.Value, grid.Value, entity.Comp.Coordinates);
         return AnchorEntity(entity, grid.Value, tileIndices);
-    }
-
-    public void Unanchor(EntityUid uid)
-    {
-        Unanchor(uid, XformQuery.GetComponent(uid));
     }
 
     public void Unanchor(EntityUid uid, TransformComponent xform, bool setPhysics = true)
@@ -202,7 +192,7 @@ public abstract partial class SharedTransformSystem
 
     #region Component Lifetime
 
-    internal (EntityUid?, MapId) InitializeMapUid(EntityUid uid, TransformComponent xform)
+    private (EntityUid?, MapId) InitializeMapUid(EntityUid uid, TransformComponent xform)
     {
         if (xform._mapIdInitialized)
             return (xform.MapUid, xform.MapID);
@@ -1106,6 +1096,13 @@ public abstract partial class SharedTransformSystem
     #endregion
 
     #region Set Position+Rotation
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Obsolete("Use override with EntityUid")]
+    public void SetWorldPositionRotation(TransformComponent component, Vector2 worldPos, Angle worldRot)
+    {
+        SetWorldPositionRotation(component.Owner, worldPos, worldRot, component);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetWorldPositionRotation(EntityUid uid, Vector2 worldPos, Angle worldRot, TransformComponent? component = null)

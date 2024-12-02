@@ -97,7 +97,7 @@ public record UnexpectedCloseBrace : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted("Unexpected closing brace.");
+        return FormattedMessage.FromMarkup("Unexpected closing brace.");
     }
 
     public string? Expression { get; set; }

@@ -18,9 +18,6 @@ internal abstract partial class SharedPlayerManager
         if (LastStateUpdate < fromTick)
             return;
 
-        // TODO PlayerManager delta states
-        // Track last update tick/time per session, and only send sessions that actually changed.
-
         states.EnsureCapacity(InternalSessions.Count);
         foreach (var player in InternalSessions.Values)
         {

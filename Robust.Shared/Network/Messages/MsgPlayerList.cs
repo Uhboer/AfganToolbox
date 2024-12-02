@@ -25,6 +25,7 @@ namespace Robust.Shared.Network.Messages
                     UserId = new NetUserId(buffer.ReadGuid()),
                     Name = buffer.ReadString(),
                     Status = (SessionStatus)buffer.ReadByte(),
+                    Ping = buffer.ReadInt16()
                 };
                 Plyrs.Add(plyNfo);
             }
@@ -39,6 +40,7 @@ namespace Robust.Shared.Network.Messages
                 buffer.Write(ply.UserId.UserId);
                 buffer.Write(ply.Name);
                 buffer.Write((byte) ply.Status);
+                buffer.Write(ply.Ping);
             }
         }
     }

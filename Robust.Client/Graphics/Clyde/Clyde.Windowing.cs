@@ -188,7 +188,7 @@ namespace Robust.Client.Graphics.Clyde
                 {
                     if (!TryInitMainWindow(glSpec, out lastError))
                     {
-                        _sawmillWin.Debug($"OpenGL {glSpec.OpenGLVersion} unsupported: {lastError}");
+                        Logger.DebugS("clyde.win", $"OpenGL {glSpec.OpenGLVersion} unsupported: {lastError}");
                         continue;
                     }
 
@@ -199,7 +199,7 @@ namespace Robust.Client.Graphics.Clyde
             else
             {
                 if (!TryInitMainWindow(null, out lastError))
-                    _sawmillWin.Debug($"Failed to create window: {lastError}");
+                    Logger.DebugS("clyde.win", $"Failed to create window: {lastError}");
                 else
                     succeeded = true;
             }
@@ -230,7 +230,8 @@ namespace Robust.Client.Graphics.Clyde
                     }
                 }
 
-                _sawmillWin.Fatal("Failed to create main game window! " +
+                Logger.FatalS("clyde.win",
+                    "Failed to create main game window! " +
                     "This probably means your GPU is too old to run the game. " +
                     $"That or update your graphics drivers. {lastError}");
 
@@ -343,8 +344,6 @@ namespace Robust.Client.Graphics.Clyde
                 if (isMain)
                     _mainWindow = reg;
 
-                reg.IsVisible = parameters.Visible;
-
                 _windows.Add(reg);
                 _windowHandles.Add(reg.Handle);
 
@@ -446,12 +445,6 @@ namespace Robust.Client.Graphics.Clyde
             _windowing!.CursorSet(_mainWindow!, cursor);
         }
 
-        private void SetWindowSize(WindowReg reg, Vector2i size)
-        {
-            DebugTools.AssertNotNull(_windowing);
-
-            _windowing!.WindowSetSize(reg, size);
-        }
 
         private void SetWindowVisible(WindowReg reg, bool visible)
         {
@@ -541,11 +534,7 @@ namespace Robust.Client.Graphics.Clyde
                 _clyde.DoDestroyWindow(Reg);
             }
 
-            public Vector2i Size
-            {
-                get => Reg.FramebufferSize;
-                set => _clyde.SetWindowSize(Reg, value);
-            }
+            public Vector2i Size => Reg.FramebufferSize;
 
             public IRenderTarget RenderTarget => Reg.RenderTarget;
 

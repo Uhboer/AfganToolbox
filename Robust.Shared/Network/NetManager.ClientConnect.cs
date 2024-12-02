@@ -132,13 +132,13 @@ namespace Robust.Shared.Network
             var hasPubKey = !string.IsNullOrEmpty(pubKey);
             var authenticate = !string.IsNullOrEmpty(authToken);
 
-            byte[] legacyHwid = [];
-
+            var hwId = ImmutableArray.Create(HWId.Calc());
             var msgLogin = new MsgLoginStart
             {
                 UserName = userNameRequest,
                 CanAuth = authenticate,
                 NeedPubKey = !hasPubKey,
+                HWId = hwId,
                 Encrypt = encrypt
             };
 
@@ -191,14 +191,7 @@ namespace Robust.Shared.Network
                 var authHashBytes = MakeAuthHash(sharedSecret, keyBytes);
                 var authHash = Convert.ToBase64String(authHashBytes);
 
-                byte[]? modernHwid = null;
-                if (_authManager.AllowHwid && encRequest.WantHwid)
-                {
-                    legacyHwid = _hwId.GetLegacy();
-                    modernHwid = _hwId.GetModern();
-                }
-
-                var joinReq = new JoinRequest(authHash, Base64Helpers.ToBase64Nullable(modernHwid));
+                var joinReq = new JoinRequest(authHash);
                 var request = new HttpRequestMessage(HttpMethod.Post, authServer + "api/session/join");
                 request.Content = JsonContent.Create(joinReq);
                 request.Headers.Authorization = new AuthenticationHeaderValue("SS14Auth", authToken);
@@ -209,8 +202,7 @@ namespace Robust.Shared.Network
                 var encryptionResponse = new MsgEncryptionResponse
                 {
                     SealedData = sealedData,
-                    UserId = userId!.Value.UserId,
-                    LegacyHwid = legacyHwid
+                    UserId = userId!.Value.UserId
                 };
 
                 var outEncRespMsg = peer.Peer.CreateMessage();
@@ -225,12 +217,11 @@ namespace Robust.Shared.Network
             var msgSuc = new MsgLoginSuccess();
             msgSuc.ReadFromBuffer(response, _serializer);
 
-            var channel = new NetChannel(this, connection, msgSuc.UserData with { HWId = [..legacyHwid] }, msgSuc.Type);
+            var channel = new NetChannel(this, connection, msgSuc.UserData with { HWId = hwId }, msgSuc.Type);
             _channels.Add(connection, channel);
             peer.AddChannel(channel);
 
-            channel.Encryption = encryption;
-            SetupEncryptionChannel(channel);
+            _clientEncryption = encryption;
         }
 
         private byte[] MakeAuthHash(byte[] sharedSecret, byte[] pkBytes)
@@ -528,6 +519,6 @@ namespace Robust.Shared.Network
             }
         }
 
-        private sealed record JoinRequest(string Hash, string? Hwid);
+        private sealed record JoinRequest(string Hash);
     }
 }

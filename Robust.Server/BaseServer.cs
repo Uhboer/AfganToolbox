@@ -86,7 +86,7 @@ namespace Robust.Server
         [Dependency] private readonly ITaskManager _taskManager = default!;
         [Dependency] private readonly IRuntimeLog _runtimeLog = default!;
         [Dependency] private readonly IModLoaderInternal _modLoader = default!;
-        [Dependency] private readonly IWatchdogApiInternal _watchdogApi = default!;
+        [Dependency] private readonly IWatchdogApi _watchdogApi = default!;
         [Dependency] private readonly HubManager _hubManager = default!;
         [Dependency] private readonly IScriptHost _scriptHost = default!;
         [Dependency] private readonly IMetricsManagerInternal _metricsManager = default!;
@@ -104,7 +104,6 @@ namespace Robust.Server
         [Dependency] private readonly IComponentFactory _componentFactory = default!;
         [Dependency] private readonly IReplayRecordingManagerInternal _replay = default!;
         [Dependency] private readonly IGamePrototypeLoadManager _protoLoadMan = default!;
-        [Dependency] private readonly UploadedContentManager _uploadedContMan = default!;
         [Dependency] private readonly NetworkResourceManager _netResMan = default!;
         [Dependency] private readonly IReflectionManager _refMan = default!;
 
@@ -394,7 +393,6 @@ namespace Robust.Server
             _scriptHost.Initialize();
             _protoLoadMan.Initialize();
             _netResMan.Initialize();
-            _uploadedContMan.Initialize();
 
             // String serializer has to be locked before PostInit as content can depend on it (e.g., replays that start
             // automatically recording on startup).
@@ -566,7 +564,7 @@ namespace Robust.Server
             // Don't start the main loop. This only works if a reason is passed to Shutdown(...)
             if (_shutdownReason != null)
             {
-                _logger.Fatal("Shutdown has been requested before the main loop has been started, complying. Reason: {0}", _shutdownReason);
+                _logger.Fatal("Shutdown has been requested before the main loop has been started, complying.");
             }
             else _mainLoop.Run();
 

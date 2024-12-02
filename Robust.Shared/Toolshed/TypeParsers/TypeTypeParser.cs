@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Robust.Shared.Console;
 using Robust.Shared.ContentPack;
 using Robust.Shared.IoC;
+using Robust.Shared.Log;
 using Robust.Shared.Maths;
 using Robust.Shared.Toolshed.Errors;
 using Robust.Shared.Toolshed.Syntax;
@@ -55,7 +56,6 @@ internal sealed class TypeTypeParser : TypeParser<Type>
     };
 
     private readonly HashSet<string> _ambiguousTypes = new();
-    private CompletionResult? _optionsCache;
 
     public override void PostInject()
     {
@@ -75,8 +75,6 @@ internal sealed class TypeTypeParser : TypeParser<Type>
                 }
             }
         }
-
-        _optionsCache = CompletionResult.FromHintOptions(Types.Select(x => new CompletionOption(x.Key)), "C# level type");
     }
 
     public override bool TryParse(ParserContext parserContext, [NotNullWhen(true)] out object? result, out IConError? error)
@@ -170,7 +168,8 @@ internal sealed class TypeTypeParser : TypeParser<Type>
         string? argName)
     {
         // TODO: Suggest generics.
-        return ValueTask.FromResult<(CompletionResult? result, IConError? error)>((_optionsCache, null));
+        var options = Types.Select(x => new CompletionOption(x.Key));
+        return ValueTask.FromResult<(CompletionResult? result, IConError? error)>((CompletionResult.FromHintOptions(options, "C# level type"), null));
     }
 }
 
@@ -178,7 +177,9 @@ public record struct ExpectedNextType() : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted("Expected another type in the generic arguments.");
+        var msg = new FormattedMessage();
+        msg.AddText($"Expected another type in the generic arguments.");
+        return msg;
     }
 
     public string? Expression { get; set; }
@@ -190,7 +191,9 @@ public record struct ExpectedGeneric() : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted("Expected a generic type, did you forget the angle brackets?");
+        var msg = new FormattedMessage();
+        msg.AddText($"Expected a generic type, did you forget the angle brackets?");
+        return msg;
     }
 
     public string? Expression { get; set; }
@@ -202,7 +205,9 @@ public record struct UnknownType(string T) : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted($"The type {T} is not known and cannot be used.");
+        var msg = new FormattedMessage();
+        msg.AddText($"The type {T} is not known and cannot be used.");
+        return msg;
     }
 
     public string? Expression { get; set; }
@@ -215,7 +220,9 @@ internal record struct TypeIsSandboxViolation(Type T) : IConError
 {
     public FormattedMessage DescribeInner()
     {
-        return FormattedMessage.FromUnformatted($"The type {T.PrettyName()} is not permitted under sandbox rules.");
+        var msg = new FormattedMessage();
+        msg.AddText($"The type {T.PrettyName()} is not permitted under sandbox rules.");
+        return msg;
     }
 
     public string? Expression { get; set; }

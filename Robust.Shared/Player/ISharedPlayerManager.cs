@@ -167,4 +167,7 @@ public interface ISharedPlayerManager
     /// Set the session's status to <see cref="SessionStatus.InGame"/>.
     /// </summary>
     void JoinGame(ICommonSession session);
+
+    [Obsolete("Use GetSessionById()")]
+    ICommonSession GetSessionByUserId(NetUserId user) => GetSessionById(user);
 }

@@ -28,7 +28,6 @@ using System.Runtime.InteropServices;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using Robust.Shared.Physics.Collision.Shapes;
-using Robust.Shared.Physics.Shapes;
 using Robust.Shared.Utility;
 
 namespace Robust.Shared.Physics.Collision;
@@ -62,18 +61,9 @@ internal ref struct DistanceProxy
                 break;
 
             case ShapeType.Polygon:
-                if (shape is Polygon poly)
-                {
-                    Vertices = poly.Vertices;
-                    Radius = poly.Radius;
-                }
-                else
-                {
-                    var polyShape = (PolygonShape) shape;
-                    Vertices = polyShape.Vertices;
-                    Radius = polyShape.Radius;
-                }
-
+                var polygon = (PolygonShape) shape;
+                Vertices = polygon.Vertices;
+                Radius = polygon.Radius;
                 break;
 
             case ShapeType.Chain:

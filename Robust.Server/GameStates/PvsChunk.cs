@@ -141,10 +141,9 @@ internal sealed class PvsChunk
         {
             // TODO ARCH multi-component queries
             if (!meta.TryGetComponent(child, out var childMeta)
-                || !xform.TryGetComponent(child, out var childXform)
-                || childMeta.EntityLifeStage >= EntityLifeStage.Terminating)
+                || !xform.TryGetComponent(child, out var childXform))
             {
-                DebugTools.Assert($"PVS chunk contains a delete or terminating entity: {child}");
+                DebugTools.Assert($"PVS chunk contains a deleted entity: {child}");
                 MarkDirty();
                 return false;
             }
@@ -189,10 +188,9 @@ internal sealed class PvsChunk
                 {
                     // TODO ARCH multi-component queries
                     if (!meta.TryGetComponent(child, out var childMeta)
-                        || !xform.TryGetComponent(child, out var childXform)
-                        || childMeta.EntityLifeStage >= EntityLifeStage.Terminating)
+                        || !xform.TryGetComponent(child, out var childXform))
                     {
-                        DebugTools.Assert($"PVS chunk contains a delete or terminating entity: {child}");
+                        DebugTools.Assert($"PVS chunk contains a deleted entity: {child}");
                         MarkDirty();
                         return false;
                     }

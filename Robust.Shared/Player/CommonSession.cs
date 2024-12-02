@@ -20,12 +20,7 @@ internal sealed class CommonSession : ICommonSessionInternal
     public string Name { get; set; } = "<Unknown>";
 
     [ViewVariables]
-    public short Ping
-    {
-        get => Channel?.Ping ?? _ping;
-        set => _ping = value;
-    }
-    private short _ping;
+    public short Ping { get; set; }
 
     [ViewVariables]
     public DateTime ConnectedTime { get; set; }

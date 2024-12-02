@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Robust.Shared.Utility
@@ -51,16 +50,5 @@ namespace Robust.Shared.Utility
             return Convert.FromBase64String(s);
         }
 
-        /// <summary>
-        /// Convert a byte array to base64. Returns null if the input byte array is null.
-        /// </summary>
-        [return: NotNullIfNotNull(nameof(data))]
-        public static string? ToBase64Nullable(byte[]? data)
-        {
-            if (data == null)
-                return null;
-
-            return Convert.ToBase64String(data, Base64FormattingOptions.None);
-        }
     }
 }

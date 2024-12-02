@@ -37,8 +37,6 @@ namespace Robust.Client.Graphics.Clyde
             // NOTE: This class only handles GLES3/D3D11.
             // For anything lower we just let ANGLE fall back and do the work 100%.
 
-            private readonly ISawmill _sawmill;
-
             private IDXGIFactory1* _factory;
             private IDXGIAdapter1* _adapter;
             private ID3D11Device* _device;
@@ -60,7 +58,6 @@ namespace Robust.Client.Graphics.Clyde
 
             public GLContextAngle(Clyde clyde) : base(clyde)
             {
-                _sawmill = clyde._logManager.GetSawmill("clyde.ogl.angle");
             }
 
             public override GLContextSpec? SpecWithOpenGLVersion(RendererOpenGLVersion version)
@@ -190,7 +187,7 @@ namespace Robust.Client.Graphics.Clyde
                 }
                 catch (Exception e)
                 {
-                    _sawmill.Error($"Failed to initialize custom ANGLE: {e}");
+                    Logger.ErrorS("clyde.ogl.angle", $"Failed to initialize custom ANGLE: {e}");
                     Shutdown();
                     return false;
                 }
@@ -210,7 +207,7 @@ namespace Robust.Client.Graphics.Clyde
             private void TryInitializeCore()
             {
                 var extensions = Marshal.PtrToStringUTF8((nint) eglQueryString(null, EGL_EXTENSIONS));
-                _sawmill.Debug($"EGL client extensions: {extensions}!");
+                Logger.DebugS("clyde.ogl.angle", $"EGL client extensions: {extensions}!");
 
                 CreateD3D11Device();
                 CreateEglContext();
@@ -235,10 +232,10 @@ namespace Robust.Client.Graphics.Clyde
                 var version = Marshal.PtrToStringUTF8((nint) eglQueryString(_eglDisplay, EGL_VERSION));
                 var extensions = Marshal.PtrToStringUTF8((nint) eglQueryString(_eglDisplay, EGL_EXTENSIONS));
 
-                _sawmill.Debug("EGL initialized!");
-                _sawmill.Debug($"EGL vendor: {vendor}!");
-                _sawmill.Debug($"EGL version: {version}!");
-                _sawmill.Debug($"EGL extensions: {extensions}!");
+                Logger.DebugS("clyde.ogl.angle", "EGL initialized!");
+                Logger.DebugS("clyde.ogl.angle", $"EGL vendor: {vendor}!");
+                Logger.DebugS("clyde.ogl.angle", $"EGL version: {version}!");
+                Logger.DebugS("clyde.ogl.angle", $"EGL extensions: {extensions}!");
 
                 if (eglBindAPI(EGL_OPENGL_ES_API) != EGL_TRUE)
                     throw new Exception("eglBindAPI failed.");
@@ -265,11 +262,11 @@ namespace Robust.Client.Graphics.Clyde
                 if (numConfigs == 0)
                     throw new Exception("No compatible EGL configurations returned!");
 
-                _sawmill.Debug($"{numConfigs} EGL configs possible!");
+                Logger.DebugS("clyde.ogl.angle", $"{numConfigs} EGL configs possible!");
 
                 for (var i = 0; i < numConfigs; i++)
                 {
-                    _sawmill.Debug(DumpEglConfig(_eglDisplay, configs[i]));
+                    Logger.DebugS("clyde.ogl.angle", DumpEglConfig(_eglDisplay, configs[i]));
                 }
 
                 _eglConfig = configs[0];
@@ -289,7 +286,7 @@ namespace Robust.Client.Graphics.Clyde
                 if (_eglContext == (void*) EGL_NO_CONTEXT)
                     throw new Exception("eglCreateContext failed!");
 
-                _sawmill.Debug("EGL context created!");
+                Logger.DebugS("clyde.ogl.angle", "EGL context created!");
 
                 Clyde._openGLVersion = _es3 ? RendererOpenGLVersion.GLES3 : RendererOpenGLVersion.GLES2;
             }
@@ -314,10 +311,11 @@ namespace Robust.Client.Graphics.Clyde
 
                         if (_adapter == null)
                         {
-                            _sawmill.Warning($"Unable to find display adapter with requested name: {adapterName}");
+                            Logger.WarningS("clyde.ogl.angle",
+                                $"Unable to find display adapter with requested name: {adapterName}");
                         }
 
-                        _sawmill.Debug($"Found display adapter with name: {adapterName}");
+                        Logger.DebugS("clyde.ogl.angle", $"Found display adapter with name: {adapterName}");
                     }
 
 #pragma warning disable CA1416
@@ -417,9 +415,9 @@ namespace Robust.Client.Graphics.Clyde
 
                     var descName = ((ReadOnlySpan<char>)desc.Description).TrimEnd('\0');
 
-                    _sawmill.Debug("Successfully created D3D11 device!");
-                    _sawmill.Debug($"D3D11 Device Adapter: {descName.ToString()}");
-                    _sawmill.Debug($"D3D11 Device FL: {_deviceFl}");
+                    Logger.DebugS("clyde.ogl.angle", "Successfully created D3D11 device!");
+                    Logger.DebugS("clyde.ogl.angle", $"D3D11 Device Adapter: {descName.ToString()}");
+                    Logger.DebugS("clyde.ogl.angle", $"D3D11 Device FL: {_deviceFl}");
 
                     if (_deviceFl == D3D_FEATURE_LEVEL_9_1)
                     {

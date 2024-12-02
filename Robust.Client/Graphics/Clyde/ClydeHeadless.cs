@@ -361,10 +361,6 @@ namespace Robust.Client.Graphics.Clyde
             {
             }
 
-            private protected override void SetParameterImpl(string name, bool[] value)
-            {
-            }
-
             private protected override void SetParameterImpl(string name, in Matrix3x2 value)
             {
             }
@@ -517,7 +513,7 @@ namespace Robust.Client.Graphics.Clyde
                 RenderTarget = renderTarget;
             }
 
-            public Vector2i Size { get; set; } = default;
+            public Vector2i Size { get; } = default;
             public bool IsDisposed { get; private set; }
             public WindowId Id { get; set; }
             public IRenderTarget RenderTarget { get; }

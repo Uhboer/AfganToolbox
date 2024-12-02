@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Robust.Shared.IoC;
 using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
 
 namespace Robust.Shared.GameObjects
 {
@@ -12,28 +10,16 @@ namespace Robust.Shared.GameObjects
     public abstract class BoundUserInterface : IDisposable
     {
         [Dependency] protected readonly IEntityManager EntMan = default!;
-        [Dependency] protected readonly ISharedPlayerManager PlayerManager = default!;
+        [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
         protected readonly SharedUserInterfaceSystem UiSystem;
 
         public readonly Enum UiKey;
         public EntityUid Owner { get; }
 
         /// <summary>
-        /// Additional controls to be disposed when this BUI is disposed.
-        /// </summary>
-        internal List<IDisposable>? Disposals;
-
-        /// <summary>
         ///     The last received state object sent from the server.
         /// </summary>
         protected internal BoundUserInterfaceState? State { get; internal set; }
-
-        // Bandaid just for storage :)
-        /// <summary>
-        /// Defers state handling
-        /// </summary>
-        [Obsolete]
-        public virtual bool DeferredClose { get; } = true;
 
         protected BoundUserInterface(EntityUid owner, Enum uiKey)
         {
@@ -60,14 +46,6 @@ namespace Robust.Shared.GameObjects
         }
 
         /// <summary>
-        /// Helper method that gets called upon prototype reload.
-        /// </summary>
-        public virtual void OnProtoReload(PrototypesReloadedEventArgs args)
-        {
-
-        }
-
-        /// <summary>
         ///     Invoked when the server sends an arbitrary message.
         /// </summary>
         protected internal virtual void ReceiveMessage(BoundUserInterfaceMessage message)
@@ -79,7 +57,7 @@ namespace Robust.Shared.GameObjects
         /// </summary>
         public void Close()
         {
-            UiSystem.CloseUi(Owner, UiKey, PlayerManager.LocalEntity, predicted: true);
+            UiSystem.CloseUi(Owner, UiKey, _playerManager.LocalEntity, predicted: true);
         }
 
         /// <summary>
@@ -108,18 +86,6 @@ namespace Robust.Shared.GameObjects
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (Disposals != null)
-                {
-                    foreach (var control in Disposals)
-                    {
-                        control.Dispose();
-                    }
-
-                    Disposals = null;
-                }
-            }
         }
     }
 }

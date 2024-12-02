@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 using Robust.Client.Graphics;
 using Robust.Shared.Input;
@@ -22,8 +21,6 @@ namespace Robust.Client.UserInterface.Controls
 
         private int _currentTab;
         private bool _tabsVisible = true;
-        // The right-most coordinate of each tab header
-        private List<float> _tabRight = new();
 
         public int CurrentTab
         {
@@ -160,14 +157,11 @@ namespace Robust.Client.UserInterface.Controls
 
             var headerOffset = 0f;
 
-            _tabRight.Clear();
-
             // Then, draw the tabs.
             for (var i = 0; i < ChildCount; i++)
             {
                 if (!GetTabVisible(i))
                 {
-                    _tabRight.Add(headerOffset);
                     continue;
                 }
 
@@ -220,8 +214,6 @@ namespace Robust.Client.UserInterface.Controls
                 }
 
                 headerOffset += boxAdvance;
-                // Remember the right-most point of this tab, for testing clicked areas
-                _tabRight.Add(headerOffset);
             }
         }
 
@@ -291,17 +283,46 @@ namespace Robust.Client.UserInterface.Controls
             args.Handle();
 
             var relX = args.RelativePixelPosition.X;
-            float tabLeft = 0;
+
+            var font = _getFont();
+            var boxActive = _getTabBoxActive();
+            var boxInactive = _getTabBoxInactive();
+
+            var headerOffset = 0f;
+
             for (var i = 0; i < ChildCount; i++)
             {
-                if (relX > tabLeft && relX <= _tabRight[i])
+                if (!GetTabVisible(i))
                 {
+                    continue;
+                }
+
+                var title = GetActualTabTitle(i);
+
+                var titleLength = 0;
+                // Get string length.
+                foreach (var rune in title.EnumerateRunes())
+                {
+                    if (!font.TryGetCharMetrics(rune, UIScale, out var metrics))
+                    {
+                        continue;
+                    }
+
+                    titleLength += metrics.Advance;
+                }
+
+                var active = _currentTab == i;
+                var box = active ? boxActive : boxInactive;
+                var boxAdvance = titleLength + (box?.MinimumSize.X ?? 0);
+
+                if (headerOffset < relX && headerOffset + boxAdvance > relX)
+                {
+                    // Got em.
                     CurrentTab = i;
                     return;
                 }
 
-                // Next tab starts here
-                tabLeft = _tabRight[i];
+                headerOffset += boxAdvance;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Robust.Shared.GameObjects;
+using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
@@ -18,12 +19,12 @@ namespace Robust.Client.Placement.Modes
             MouseCoords = ScreenToCursorGrid(mouseScreen);
 
             var tileSize = 1f;
-            var gridIdOpt = pManager.EntityManager.System<SharedTransformSystem>().GetGrid(MouseCoords);
+            var gridIdOpt = MouseCoords.GetGridUid(pManager.EntityManager);
 
-            if (gridIdOpt is { } gridId && gridId.IsValid())
+            if (gridIdOpt is EntityUid gridId && gridId.IsValid())
             {
                 var mapGrid = pManager.EntityManager.GetComponent<MapGridComponent>(gridId);
-                CurrentTile = pManager.EntityManager.System<SharedMapSystem>().GetTileRef(gridId, mapGrid ,MouseCoords);
+                CurrentTile = mapGrid.GetTileRef(MouseCoords);
                 tileSize = mapGrid.TileSize; //convert from ushort to float
             }
 
@@ -49,12 +50,12 @@ namespace Robust.Client.Placement.Modes
                 return false;
             }
 
-            var map = pManager.EntityManager.System<SharedTransformSystem>().GetMapId(MouseCoords);
+            var map = MouseCoords.GetMapId(pManager.EntityManager);
             var bottomLeft = new Vector2(CurrentTile.X, CurrentTile.Y);
             var topRight = new Vector2(CurrentTile.X + 0.99f, CurrentTile.Y + 0.99f);
             var box = new Box2(bottomLeft, topRight);
 
-            return !pManager.EntityManager.System<EntityLookupSystem>().AnyEntitiesIntersecting(map, box);
+            return !EntitySystem.Get<EntityLookupSystem>().AnyEntitiesIntersecting(map, box);
         }
     }
 }

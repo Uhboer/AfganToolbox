@@ -23,7 +23,6 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using Robust.Shared.Configuration;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
@@ -62,12 +61,18 @@ namespace Robust.Shared.Physics.Collision.Shapes
         /// <summary>
         /// The radius of this polygon.
         /// </summary>
-        [DataField, Access(typeof(SharedPhysicsSystem), Friend = AccessPermissions.ReadWriteExecute, Other = AccessPermissions.Read)]
+        [DataField("radius"), Access(typeof(SharedPhysicsSystem), Friend = AccessPermissions.ReadWriteExecute, Other = AccessPermissions.Read)]
         public float Radius { get; set; } = PhysicsConstants.PolygonRadius;
 
         public bool Set(List<Vector2> vertices)
         {
-            var verts = CollectionsMarshal.AsSpan(vertices);
+            Span<Vector2> verts = stackalloc Vector2[vertices.Count];
+
+            for (var i = 0; i < vertices.Count; i++)
+            {
+                verts[i] = vertices[i];
+            }
+
             return Set(verts, vertices.Count);
         }
 
@@ -86,7 +91,7 @@ namespace Robust.Shared.Physics.Collision.Shapes
             return true;
         }
 
-        internal void Set(PhysicsHull hull)
+        public void Set(PhysicsHull hull)
         {
             DebugTools.Assert(hull.Count >= 3);
             var vertexCount = hull.Count;
@@ -183,16 +188,17 @@ namespace Robust.Shared.Physics.Collision.Shapes
             Set(Vertices.AsSpan(), VertexCount);
         }
 
-        public void Set(Box2Rotated bounds)
+        public bool Set(Box2Rotated bounds)
         {
-            Span<Vector2> verts = stackalloc Vector2[4];
-            verts[0] = bounds.BottomLeft;
-            verts[1] = bounds.BottomRight;
-            verts[2] = bounds.TopRight;
-            verts[3] = bounds.TopLeft;
+            Span<Vector2> vertices = stackalloc Vector2[]
+            {
+                bounds.BottomLeft,
+                bounds.BottomRight,
+                bounds.TopRight,
+                bounds.TopLeft,
+            };
 
-            var hull = new PhysicsHull(verts, 4);
-            Set(hull);
+            return Set(vertices, 4);
         }
 
         public void SetAsBox(Box2 box)

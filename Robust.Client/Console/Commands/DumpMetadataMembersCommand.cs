@@ -11,7 +11,7 @@ namespace Robust.Client.Console.Commands
 
         public override void Execute(IConsoleShell shell, string argStr, string[] args)
         {
-            var type = GetType(args[0]);
+            var type = Type.GetType(args[0]);
 
             if (type == null)
             {
@@ -24,17 +24,6 @@ namespace Robust.Client.Console.Commands
                 System.Console.WriteLine(@$"- ""{sig}""");
                 shell.WriteLine(sig);
             }
-        }
-
-        private Type? GetType(string name)
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (assembly.GetType(name) is { } type)
-                    return type;
-            }
-
-            return null;
         }
     }
 #endif

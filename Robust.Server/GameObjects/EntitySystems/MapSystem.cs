@@ -53,21 +53,20 @@ namespace Robust.Server.GameObjects
                 var query = AllEntityQuery<MapGridComponent>();
                 while (query.MoveNext(out var uid, out var grid))
                 {
-                    if (!GridEmpty((uid, grid)))
-                        continue;
+                    if (!GridEmpty(grid)) continue;
                     toDelete.Add(uid);
                 }
 
                 foreach (var uid in toDelete)
                 {
-                    EntityManager.DeleteEntity(uid);
+                    MapManager.DeleteGrid(uid);
                 }
             }
         }
 
-        private bool GridEmpty(Entity<MapGridComponent> entity)
+        private bool GridEmpty(MapGridComponent grid)
         {
-            return !(GetAllTiles(entity, entity).Any());
+            return !(grid.GetAllTiles().Any());
         }
 
         private void HandleGridEmpty(EntityUid uid, MapGridComponent component, EmptyGridEvent args)
@@ -75,7 +74,7 @@ namespace Robust.Server.GameObjects
             if (!_deleteEmptyGrids || TerminatingOrDeleted(uid) || HasComp<MapComponent>(uid))
                 return;
 
-            EntityManager.DeleteEntity(args.GridId);
+            MapManager.DeleteGrid(args.GridId);
         }
     }
 }
